@@ -440,6 +440,20 @@ Custom property | Description
               this.set('interactionSpaceConfig.lassoType', 'yRect');
             }
           },
+          filterIn: {
+            tooltipLabel: 'Filter in',
+            icon: 'px-vis:draw-stripe',
+            onClick: function() {
+              this.set('interactionSpaceConfig.lassoType', 'filterIn');
+            }
+          },
+          filterOut: {
+            tooltipLabel: 'Filter out',
+            icon: 'px-vis:remove-stripe',
+            onClick: function() {
+              this.set('interactionSpaceConfig.lassoType', 'filterOut');
+            }
+          },
           freeform: {
             tooltipLabel: 'Freeform Lasso',
             icon: 'px-vis:xy-axis',
