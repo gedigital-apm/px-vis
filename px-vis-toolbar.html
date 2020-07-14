@@ -444,14 +444,14 @@ Custom property | Description
             tooltipLabel: 'Filter in',
             icon: 'px-vis:draw-stripe',
             onClick: function() {
-              this.set('interactionSpaceConfig.lassoType', 'filterIn');
+              this.fire('apply-lasso-filter', 'filterIn');
             }
           },
           filterOut: {
             tooltipLabel: 'Filter out',
             icon: 'px-vis:remove-stripe',
             onClick: function() {
-              this.set('interactionSpaceConfig.lassoType', 'filterOut');
+              this.fire('apply-lasso-filter', 'filterOut');
             }
           },
           freeform: {

@@ -128,6 +128,7 @@ PxVisBehaviorInteraction.lasso = [{
 
       this._calcData();
     }
+    this.fire('enable-lasso-filter');
   },
 
   _updateLasso: function(first) {
@@ -233,7 +234,6 @@ PxVisBehaviorInteraction.lasso = [{
     this._lassoCoords = [];
     this._isLassoing = false;
     this._lassoCrosshairData = this.crosshairData;
-    this.fire('enable-lasso-filter', this._lassoCrosshairData);
   }
 }, PxVisBehavior.observerCheck]
 </script>
