@@ -162,7 +162,7 @@ Custom property | Description
         <span id="subRow" class$="flex subrow--container [[_getRowDirection(horizontalAlignment)]] [[_getSubRowClass(subToolbarAlignment)]]">
           <template id="subRepeat" is="dom-repeat" items="{{currentSubConfig}}" strip-whitespace>
             <span
-              class$="u-p- flex__item main-item subrow--item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item.disabled)]] [[_hide(item.hidden)]]"
+              class$="u-p- flex__item main-item subrow--item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item.disabled,  currentSubConfig)]] [[_hide(item.hidden)]]"
               on-tap="_clickSubItem"
               on-mouseenter="_onItemHover"
               on-mouseleave="_onItemLeave"
@@ -421,7 +421,16 @@ Custom property | Description
         actionConfig: {
           mouseout: null,
           mousemove: null,
-          click: null,
+          click: function() {
+            var toolbar = this.getToolbar();
+            if (toolbar) {
+              this.toolbarConfig.config.crosshairLassoTimeseries
+                .subConfig.filterIn.disabled = false;
+              this.toolbarConfig.config.crosshairLassoTimeseries
+                .subConfig.filterOut.disabled = false;
+              toolbar._applyConfigChanges(this.toolbarConfig, 'crosshairLassoTimeseries');
+            }
+          },
           mousedown: 'startLasso',
           mouseup: 'stopLasso'
         },
@@ -468,6 +477,14 @@ Custom property | Description
               this.set('crosshairData', { 'rawData': [], 'timeStamps': []});
               this.set('interactionSpaceConfig.resetLassoData', !this.interactionSpaceConfig.resetLassoData);
               this.set('resetLassoData', !this.resetLassoData);
+              var toolbar = this.getToolbar();
+              if (toolbar) {
+                this.toolbarConfig.config.crosshairLassoTimeseries
+                  .subConfig.filterIn.disabled = true;
+                this.toolbarConfig.config.crosshairLassoTimeseries
+                  .subConfig.filterOut.disabled = true;
+                toolbar._applyConfigChanges(this.toolbarConfig, 'crosshairLassoTimeseries');
+              }
             }
           }
         }
@@ -1138,6 +1155,12 @@ Custom property | Description
         //notify the toolbar to process the changes
         this.reProcessConfig();
       }
+    },
+
+    _applyConfigChanges: function(toolbarConfig, configName) {
+      this.config = toolbarConfig.config;
+      var conf = this.config[configName];
+      this._tryProcessSubConfig(conf);
     },
 
     _extendConfig: function(defaultConfig, customConfig) {
