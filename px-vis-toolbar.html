@@ -146,7 +146,7 @@ Custom property | Description
       <span id="mainRow" class$="flex [[_getRowDirection(horizontalAlignment)]]">
         <template id="mainRepeat" is="dom-repeat" items="{{_internalConfig}}" strip-whitespace>
           <span
-            class$="u-p- flex__item main-item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item.disabled)]] [[_hide(item.hidden)]]"
+            class$="u-p- flex__item main-item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item)]] [[_hide(item.hidden)]]"
             style$="{{item.customButtonStyle}}"
             on-tap="_clickItem"
             on-mouseenter="_onItemHover"
@@ -162,7 +162,7 @@ Custom property | Description
         <span id="subRow" class$="flex subrow--container [[_getRowDirection(horizontalAlignment)]] [[_getSubRowClass(subToolbarAlignment)]]">
           <template id="subRepeat" is="dom-repeat" items="{{currentSubConfig}}" strip-whitespace>
             <span
-              class$="u-p- flex__item main-item subrow--item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item.disabled,  currentSubConfig)]] [[_hide(item.hidden)]]"
+              class$="u-p- flex__item main-item subrow--item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item, currentSubConfig)]] [[_hide(item.hidden)]]"
               on-tap="_clickSubItem"
               on-mouseenter="_onItemHover"
               on-mouseleave="_onItemLeave"
@@ -389,6 +389,11 @@ Custom property | Description
         onSelect: function() {
           this.set('_internalShowTooltip', false);
           this.set('interactionSpaceConfig.searchType', 'lasso');
+			var toolbarInfo = {
+				toolbar: this.getToolbar(),
+				configName: 'crosshairLassoTimeseries'
+			}
+			this.fire('set-toolbar-info', toolbarInfo);
         },
         actionConfig: {
           mouseout: null,
@@ -398,6 +403,22 @@ Custom property | Description
           mouseup: 'stopLasso'
         },
         subConfig: {
+			filterIn: {
+				tooltipLabel: 'Filter in',
+				icon: 'px-vis:draw-stripe',
+				disabled: true,
+				onClick: function() {
+					this.fire('apply-lasso-filter', 'filterIn');
+				}
+			},
+			filterOut: {
+				tooltipLabel: 'Filter out',
+				icon: 'px-vis:remove-stripe',
+				disabled: true,
+				onClick: function() {
+					this.fire('apply-lasso-filter', 'filterOut');
+				}
+			},
           clearCrosshair: {
             tooltipLabel: 'Clear lasso data',
             icon: 'px-nav:close',
@@ -405,6 +426,7 @@ Custom property | Description
               this.set('crosshairData', { 'rawData': [], 'timeStamps': []});
               this.set('interactionSpaceConfig.resetLassoData', !this.interactionSpaceConfig.resetLassoData);
               this.set('resetLassoData', !this.resetLassoData);
+				this.fire('diable-lasso-filter');
             }
           }
         }
@@ -417,20 +439,16 @@ Custom property | Description
         onSelect: function() {
           this.set('_internalShowTooltip', false);
           this.set('interactionSpaceConfig.searchType', 'lasso');
+			var toolbarInfo = {
+				toolbar: this.getToolbar(),
+				configName: 'crosshairLassoTimeseries'
+			}
+			this.fire('set-toolbar-info', toolbarInfo);
         },
         actionConfig: {
           mouseout: null,
           mousemove: null,
-          click: function() {
-            var toolbar = this.getToolbar();
-            if (toolbar) {
-              this.toolbarConfig.config.crosshairLassoTimeseries
-                .subConfig.filterIn.disabled = false;
-              this.toolbarConfig.config.crosshairLassoTimeseries
-                .subConfig.filterOut.disabled = false;
-              toolbar._applyConfigChanges(this.toolbarConfig, 'crosshairLassoTimeseries');
-            }
-          },
+          click: null,
           mousedown: 'startLasso',
           mouseup: 'stopLasso'
         },
@@ -452,6 +470,7 @@ Custom property | Description
           filterIn: {
             tooltipLabel: 'Filter in',
             icon: 'px-vis:draw-stripe',
+			  disabled: true,
             onClick: function() {
               this.fire('apply-lasso-filter', 'filterIn');
             }
@@ -459,6 +478,7 @@ Custom property | Description
           filterOut: {
             tooltipLabel: 'Filter out',
             icon: 'px-vis:remove-stripe',
+			  disabled: true,
             onClick: function() {
               this.fire('apply-lasso-filter', 'filterOut');
             }
@@ -477,14 +497,7 @@ Custom property | Description
               this.set('crosshairData', { 'rawData': [], 'timeStamps': []});
               this.set('interactionSpaceConfig.resetLassoData', !this.interactionSpaceConfig.resetLassoData);
               this.set('resetLassoData', !this.resetLassoData);
-              var toolbar = this.getToolbar();
-              if (toolbar) {
-                this.toolbarConfig.config.crosshairLassoTimeseries
-                  .subConfig.filterIn.disabled = true;
-                this.toolbarConfig.config.crosshairLassoTimeseries
-                  .subConfig.filterOut.disabled = true;
-                toolbar._applyConfigChanges(this.toolbarConfig, 'crosshairLassoTimeseries');
-              }
+              this.fire('diable-lasso-filter');
             }
           }
         }
@@ -1432,8 +1445,8 @@ Custom property | Description
     _getSelectedClass: function(selected) {
       return selected ? 'selected ' : '';
     },
-    _getDisabledClass: function(disabled) {
-      return disabled ? 'disabled ' : '';
+    _getDisabledClass: function(item) {
+      return item && item.disabled ? 'disabled ' : '';
     },
     _hasTooltip: function(item) {
      if(this.hasUndefinedArguments(arguments)) {
