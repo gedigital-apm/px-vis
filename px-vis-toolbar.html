@@ -146,7 +146,7 @@ Custom property | Description
       <span id="mainRow" class$="flex [[_getRowDirection(horizontalAlignment)]]">
         <template id="mainRepeat" is="dom-repeat" items="{{_internalConfig}}" strip-whitespace>
           <span
-            class$="u-p- flex__item main-item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item.disabled)]] [[_hide(item, _internalConfig)]] [[item.class]]"
+            class$="u-p- flex__item main-item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item, item.*)]] [[_hide(item, _internalConfig)]] [[item.class]]"
             style$="{{item.customButtonStyle}}"
             on-tap="_clickItem"
             on-mouseenter="_onItemHover"
@@ -162,7 +162,7 @@ Custom property | Description
         <span id="subRow" class$="flex subrow--container [[_getRowDirection(horizontalAlignment)]] [[_getSubRowClass(subToolbarAlignment)]]">
           <template id="subRepeat" is="dom-repeat" items="{{currentSubConfig}}" strip-whitespace>
             <span
-              class$="u-p- flex__item main-item subrow--item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item.disabled, currentSubConfig)]] [[_hide(item)]]"
+              class$="u-p- flex__item main-item subrow--item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item, item.*)]] [[_hide(item)]]"
               on-tap="_clickSubItem"
               on-mouseenter="_onItemHover"
               on-mouseleave="_onItemLeave"
@@ -1174,12 +1174,15 @@ Custom property | Description
 	 * This is mainly used to update the currentSubConfig without processing
 	 * entire subconfig which opens the toolbar
 	 */
-    _applySubConfigChanges: function(toolbarConfig, configName) {
-    	// Since we are processing make sure the property opened is retained
-		for (var i in this._internalConfig){
-    		if (this._internalConfig[i].initialKey === configName){
-				this.set('_internalConfig.' + i + '.opened', true);
-    		}
+    _applySubConfigChanges: function(toolbarConfig, configName, fromClick) {
+    	// if it is not from item click & functionally changing the value
+		// maintian the open state of the toolbar
+		if (!fromClick) {
+			for (var i in this._internalConfig){
+				if (this._internalConfig[i].initialKey === configName){
+					this.set('_internalConfig.' + i + '.opened', true);
+				}
+			}
 		}
 
       var subConfig = toolbarConfig.config[configName].subConfig;
@@ -1465,7 +1468,7 @@ Custom property | Description
       return selected ? 'selected ' : '';
     },
     _getDisabledClass: function(item) {
-      return item ? 'disabled ' : '';
+      return item && item.disabled ? 'disabled ' : '';
     },
     _hide: function(item) {
 	  return item && item.hidden ? 'hide ' : 'show';
