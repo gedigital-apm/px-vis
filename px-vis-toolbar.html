@@ -146,7 +146,7 @@ Custom property | Description
       <span id="mainRow" class$="flex [[_getRowDirection(horizontalAlignment)]]">
         <template id="mainRepeat" is="dom-repeat" items="{{_internalConfig}}" strip-whitespace>
           <span
-            class$="u-p- flex__item main-item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item)]] [[_hide(item.hidden)]]"
+            class$="u-p- flex__item main-item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item)]] [[_hide(item, _internalConfig)]] [[item.class]]"
             style$="{{item.customButtonStyle}}"
             on-tap="_clickItem"
             on-mouseenter="_onItemHover"
@@ -162,7 +162,7 @@ Custom property | Description
         <span id="subRow" class$="flex subrow--container [[_getRowDirection(horizontalAlignment)]] [[_getSubRowClass(subToolbarAlignment)]]">
           <template id="subRepeat" is="dom-repeat" items="{{currentSubConfig}}" strip-whitespace>
             <span
-              class$="u-p- flex__item main-item subrow--item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item, currentSubConfig)]] [[_hide(item.hidden)]]"
+              class$="u-p- flex__item main-item subrow--item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item, currentSubConfig)]] [[_hide(item)]]"
               on-tap="_clickSubItem"
               on-mouseenter="_onItemHover"
               on-mouseleave="_onItemLeave"
@@ -453,6 +453,13 @@ Custom property | Description
           mouseup: 'stopLasso'
         },
         subConfig: {
+			    freeform: {
+				    tooltipLabel: 'Freeform Lasso',
+				    icon: 'px-vis:xy-axis',
+				    onClick: function() {
+					    this.set('interactionSpaceConfig.lassoType', 'freeform');
+				    }
+			    },
           xRect: {
             tooltipLabel: 'Lasso on X',
             icon: 'px-vis:x-axis',
@@ -481,13 +488,6 @@ Custom property | Description
 			      disabled: true,
             onClick: function() {
               this.fire('apply-lasso-filter', 'filterOut');
-            }
-          },
-          freeform: {
-            tooltipLabel: 'Freeform Lasso',
-            icon: 'px-vis:xy-axis',
-            onClick: function() {
-              this.set('interactionSpaceConfig.lassoType', 'freeform');
             }
           },
           clearCrosshair: {
@@ -1448,6 +1448,9 @@ Custom property | Description
     _getDisabledClass: function(item) {
       return item && item.disabled ? 'disabled ' : '';
     },
+    _hide: function(item) {
+	  return item && item.hidden ? 'hide ' : 'show';
+	},
     _hasTooltip: function(item) {
      if(this.hasUndefinedArguments(arguments)) {
        return;
