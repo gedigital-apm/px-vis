@@ -1278,30 +1278,47 @@ Custom property | Description
 		 *  config & subConfig to new values
 		 *  also updates the toolbar dom instance by calling reProcessConfig
 		**/
-		updateToolbarConfigSelection: function(newControl, newSubControl) {
-			const config = this.config;
-			const allConfigs = Object.keys(config);
-			for (let i = 0; i < allConfigs.length; i++) {
-				const currentConfig = config[allConfigs[i]];
-				if (allConfigs[i] !== newControl) {
-					currentConfig.opened = false;
-					currentConfig.selected = false;
-				}
-			}
-			config[newControl].opened = true;
-			config[newControl].selected = true;
-			if (newSubControl) {
-				const allSubConfigs = Object.keys(config[newControl].subConfig);
-				for (let j = 0; j < allSubConfigs.length; j++) {
-					const currentSubConfig = config[newControl].subConfig[allSubConfigs[j]];
-					if (allSubConfigs[j] !== newSubControl) {
-						currentSubConfig.selected = false;
-					}
-				}
-				config[newControl].subConfig[newSubControl].selected = true;
-			}
-			this.reProcessConfig();
-		},
+		updateToolbarConfigSelection: function (newControl, newSubControl) {
+      this._internalConfig.forEach(function (item, index) {
+        if (item.initialKey === newControl) {
+          let hasChanges = false;
+          if (!item.selected) {
+            this.set('_internalConfig.' + index + '.selected', true);
+            hasChanges = true;
+          }
+
+          if (newSubControl) {
+            let _currentSubControl = item.subConfig[newSubControl]
+            let allSubConfigs = Object.keys(item.subConfig);
+            for (let j = 0; j < allSubConfigs.length; j++) {
+              let currentSubConfig = item.subConfig[allSubConfigs[j]];
+              if (allSubConfigs[j] != newSubControl) {
+                currentSubConfig.selected = false;
+              }
+            }
+            if (!item.subConfig[newSubControl].selected) {
+              item.subConfig[newSubControl].selected = true;
+              hasChanges = true;
+            }
+          }
+
+          if (hasChanges) {
+            this.set('currentSubConfig', []);
+            this.debounce('updateSubConfig', function () {
+              this._tryProcessSubConfig(item);
+              this._processItem(item, false);
+              this._tryApplySelectedSub(item);
+              if (!item.opened) {
+                this.set('currentSubConfig', []);
+              }
+            }, 0);
+          }
+        } else if (item.selected) {
+          this.set('_internalConfig.' + index + '.selected', false);
+          this.set('_internalConfig.' + index + '.opened', false);
+        }
+      }.bind(this));
+    },
 
     _extendConfig: function(defaultConfig, customConfig) {
       var keys = Object.keys(customConfig),
