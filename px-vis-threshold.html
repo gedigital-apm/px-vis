@@ -79,6 +79,7 @@ Custom property | Description
       PxVisBehavior.thresholds,
       PxVisBehaviorD3.domainUpdate,
       PxVisBehaviorD3.clipPath,
+      PxVisBehaviorD3.lineShared,
       PxVisBehavior.measureText,
       PxVisBehavior.updateStylesOverride
     ],
@@ -105,6 +106,15 @@ Custom property | Description
       defaultColor: {
         type: String,
         value:'rgb(0,0,0)'
+      },
+      /**
+       * 
+       * 
+       * 
+       */
+      thresholdType:{
+        type: String,
+        value: 'line'
       },
       /**
        * Holder object for the event svg "g" element.
@@ -233,7 +243,8 @@ Custom property | Description
 
       this._thresholdBuilder.exit().remove();
 
-      this._thresholdBuilder
+      if (this.thresholdType === 'line') {
+        this._thresholdBuilder
         .enter()
           .append('g')
           .attr('class', 'threshold')
@@ -257,6 +268,60 @@ Custom property | Description
             let title = _this._mergeText(d, i, this, dir);
             _this._rectWidth(this, d, title);
           });
+      } else if (this.thresholdType === 'path') {
+        this._thresholdBuilder
+        .enter()
+          .append('g')
+          .attr('class', 'threshold')
+          .attr('threshold-id',function(d){ return d.for })
+          .attr("clip-path", 'url(#' + this.clipPath + ')')
+          .each(function(d,i) {
+            _this._enterPath(d, i, this);
+          })
+        .merge(this._thresholdBuilder)
+          .each(function(d,i) {
+            updateColors = false;
+            let dir = _this.thresholdConfig && _this.thresholdConfig[d.type] && _this.thresholdConfig[d.type]['direction'] ?
+              _this.thresholdConfig[d.type]['direction'] :
+              'horizontal';
+
+            _this._mergePath(d, i, this, dir);
+          });
+      } else if (this.thresholdType === 'circle') {
+        this._thresholdBuilder
+        .enter()
+          .append('g')
+          .attr('class', 'threshold')
+          .attr('threshold-id',function(d){ return d.for })
+          .attr("clip-path", 'url(#' + this.clipPath + ')')
+          .each(function(d,i) {
+            _this._enterCircle(d, i, this);
+          })
+        .merge(this._thresholdBuilder)
+          .each(function(d,i) {
+            _this._mergeCircle(d, i, this);
+          });
+      } else if (this.thresholdType === 'polyline') {
+        this._thresholdBuilder
+        .enter()
+          .append('g')
+          .attr('class', 'threshold')
+          .attr('threshold-id',function(d){ return d.for })
+          .attr("clip-path", 'url(#' + this.clipPath + ')')
+          .each(function(d,i) {
+            _this._enterPolyLine(d, i, this);
+          })
+        .merge(this._thresholdBuilder)
+          .each(function(d,i) {
+            updateColors = false;
+            let dir = _this.thresholdConfig && _this.thresholdConfig[d.type] && _this.thresholdConfig[d.type]['direction'] ?
+              _this.thresholdConfig[d.type]['direction'] :
+              'horizontal';
+
+            _this._mergePolyLine(d, i, this, dir);
+          });
+      }
+      
 
       if(updateColors) {
         this._setColors();
@@ -288,6 +353,131 @@ Custom property | Description
             this._defaultThresholdConfig['dashPattern'];
         }.bind(this));
     },
+
+    _enterPolyLine: function(d, i, elem) {
+      Px.d3.select(elem).append('polyline')
+        .attr("class", "threshold-line");
+    },
+
+    _mergePolyLine: function(d, i, elem, dir) {
+      Px.d3.select(elem).select("polyline.threshold-line")
+        .attr('points', function(d) { return this._xyFn(d,dir,this.width,this.margin)}.bind(this))
+        .attr('fill', 'none')
+        .attr('stroke', this._getColors.bind(this))
+        .attr('stroke-width', function(d) {
+          return (this.thresholdConfig[d.type] && this.thresholdConfig[d.type]['strokeWidth'] ) ?
+            this.thresholdConfig[d.type]['strokeWidth'] :
+            this._defaultThresholdConfig['strokeWidth'];
+        }.bind(this))
+        .attr('stroke-dasharray', function(d) {
+          return this.thresholdConfig[d.type] && this.thresholdConfig[d.type]['dashPattern'] ?
+            this.thresholdConfig[d.type]['dashPattern'] :
+            this._defaultThresholdConfig['dashPattern'];
+        }.bind(this));
+    },
+
+    _xyFn: function( d, dir, width, margin){
+      var points = [];
+      var objMap = d.dimension.reduce(function(map, obj) {
+          map[obj.for] = obj;
+          return map;
+      }, {});
+      this.dimensions.forEach(dimension => {
+
+        points.push("" + this.x(dimension) + "," + this.y[dimension](objMap[dimension].value));
+      });
+      return points.join(" ");
+    },
+
+    _enterPath: function(d, i, elem) {
+      Px.d3.select(elem).append('path')
+        .attr("class", "threshold-line");
+    },
+
+    _mergePath: function(d, i, elem) {
+      Px.d3.select(elem).select("path.threshold-line")
+        .attr('d', function(d) { return this._pathFn(d)}.bind(this))
+        .attr('fill', 'none')
+        .attr('stroke', this._getColors.bind(this))
+        .attr('stroke-width', function(d) {
+          return (this.thresholdConfig[d.type] && this.thresholdConfig[d.type]['strokeWidth'] ) ?
+            this.thresholdConfig[d.type]['strokeWidth'] :
+            this._defaultThresholdConfig['strokeWidth'];
+        }.bind(this))
+        .attr('stroke-dasharray', function(d) {
+          return this.thresholdConfig[d.type] && this.thresholdConfig[d.type]['dashPattern'] ?
+            this.thresholdConfig[d.type]['dashPattern'] :
+            this._defaultThresholdConfig['dashPattern'];
+        }.bind(this));
+    },
+
+    _pathFn: function(d, dir) {
+      var _this = this;
+      var clockwiseFactor = 1;
+      path = Px.d3.radialLine()
+      .angle(function(d) {
+        return _this.x(d[0]) * clockwiseFactor;
+      })
+      .radius(function(d) {
+
+        var radius = Math.floor(_this.y(Number(d[1])));
+
+        if(typeof _this.lineRadiusLimit === 'number' && radius < _this.lineRadiusLimit) {
+          return _this.lineRadiusLimit;
+        }
+        return radius
+      }).defined(function(d) {
+        return _this._isValidData(_this.x(d[0])) && _this._isValidData(_this.y(Number(d[1])));
+      });
+
+      var objMap = d.dimension.reduce(function(map, obj) {
+          map[obj.for] = obj.value;
+          return map;
+      }, {});
+
+      var dimensions = [];
+      _this.dimensions.forEach(item => dimensions.push(item));
+      dimensions.push(dimensions[0])
+      //for each datapoint, iterate through the dimensions
+      return path(dimensions.map(function(p) {
+        //check that we have data; if not, return false so it doesnt draw a line
+        if(!objMap || typeof(objMap[p]) === 'undefined' || objMap[p] === null) {
+          return false
+        }
+        //return [x,y] to path: x is ordinal based on dim; get the y-scale for the dim and use that particular scale on the data
+        return [p,objMap[p]];
+      }));
+     
+    },
+
+    _enterCircle: function(d, i, elem) {
+      Px.d3.select(elem).append('circle')
+        .attr("class", "threshold-line");
+    },
+
+    _mergeCircle: function(d, i, elem) {
+      Px.d3.select(elem).select("circle.threshold-line")
+        .attr('r', function(d) { return this._circleFn(d) }.bind(this))
+        .attr('cx',0)
+        .attr('cy',0)
+        .attr('fill', 'none')
+        .attr('stroke', this._getColors.bind(this))
+        .attr('stroke-width', function(d) {
+          return (this.thresholdConfig[d.type] && this.thresholdConfig[d.type]['strokeWidth'] ) ?
+            this.thresholdConfig[d.type]['strokeWidth'] :
+            this._defaultThresholdConfig['strokeWidth'];
+        }.bind(this))
+        .attr('stroke-dasharray', function(d) {
+          return this.thresholdConfig[d.type] && this.thresholdConfig[d.type]['dashPattern'] ?
+            this.thresholdConfig[d.type]['dashPattern'] :
+            this._defaultThresholdConfig['dashPattern'];
+        }.bind(this));
+    },
+
+    _circleFn: function(d, dir){
+      return this.y(d.value);
+    },
+
 
     _enterRect: function(d, i, elem) {
       Px.d3.select(elem).append("rect")
