@@ -386,7 +386,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       '_setupActions(actionConfig.*)',
       '_resetTooltipDataLegacy(completeSeriesConfig.*)',
       '_resetTooltipData(seriesKeys.*, defaultEmptyData.*)',
-      '_createQuadtreeData(wwDataSyncCounter, width, height, margin.*, domainChanged, searchType, useQuadtree, counterClockwise, xAxisType, preventWebWorkerSynchronization, renderedChartData.*)',
+      '_createQuadtreeData(wwDataSyncCounter, width, height, margin.*, domainChanged, searchType, useQuadtree, counterClockwise, xAxisType, preventWebWorkerSynchronization)',
+      '_createQuadtreeDataUpdated(renderedChartData.*)',
       '_callCreateQuadtreeData(mutedSeries)',
       '_updateTooltipData(domainChanged)'
     ],
@@ -1659,6 +1660,12 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
     _callCreateQuadtreeData: function() {
       if(this.hardMute) {
+        this._createQuadtreeData();
+      }
+    },
+
+    _createQuadtreeDataUpdated: function() {
+      if(this.plotDigitalTags){
         this._createQuadtreeData();
       }
     },
