@@ -752,8 +752,14 @@ Custom property | Description
       } else if(this.seriesToAxes && this.seriesToAxes[item]) {
         for(var i = 0; i < this.seriesToAxes[item].length; i++) {
           var series = this.seriesToAxes[item][i];
-          if(this.completeSeriesConfig[series] && this.completeSeriesConfig[series]['yAxisUnit']) {
-            return this.completeSeriesConfig[series]['yAxisUnit']
+          if (this.completeSeriesConfig[series]) {
+          // this is to support individual axis units in case of multi axis charts
+           if (!_.isUndefined(this.completeSeriesConfig[series].axis.unit)) {
+              return this.completeSeriesConfig[series].axis.unit;
+            }
+            else if (this.completeSeriesConfig[series]['yAxisUnit']) {
+              return this.completeSeriesConfig[series]['yAxisUnit']
+            }    
           }
         }
       }
