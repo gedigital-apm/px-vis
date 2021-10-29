@@ -619,6 +619,26 @@ Custom property | Description
           }
         }
       },
+      resize: {
+        icon: 'px-vis:resize',
+        cursorIcon: 'px-vis:resize',
+        buttonGroup: 1,
+        hidden: false,
+        selectable: true,
+        onClick: function(e) {
+            e.toolbar.switchConfigItems('resize', 'resizeToDefault');
+        }
+      },
+      resizeToDefault: {
+        icon: 'px-utl:remove',
+        cursorIcon: 'px-vis:resize',
+        buttonGroup: 1,
+        hidden: true,
+        selectable: true,
+        onClick: function(e) {
+            e.toolbar.switchConfigItems('resizeToDefault', 'resize');
+        }
+      }, 
       crosshairFrozen: {
         tooltipLabel: 'Crosshair Frozen',
         hidden: true,
@@ -1639,14 +1659,18 @@ Custom property | Description
       }
     },
     _getSubRowClass: function(subToolbarAlignment) {
-      var base = this.subToolbarAlignment === 'above' ? '' : 'subrow--chart ';
-
-      if(this.subToolbarAlignment === 'vertical') {
-        base += ' flex--col flex--bottom right ';
+      let base;
+      if (subToolbarAlignment == 'hidden') {
+          base = 'hidden';
       } else {
-        base += ' flex--row';
+        base = this.subToolbarAlignment === 'above' ? '' : 'subrow--chart ';
+  
+        if(this.subToolbarAlignment === 'vertical') {
+          base += ' flex--col flex--bottom right ';
+        } else {
+          base += ' flex--row';
+        }
       }
-
       return base;
     },
     _isWithinChart: function(withinChart) {

@@ -3453,20 +3453,22 @@ PxVisBehaviorChart.centralTooltip = [{
 
   _centralTooltipCancelRequest: function(evt) {
     const tooltip = this._usedTooltipMap.get(evt.detail.origin);
-    const content = tooltip.querySelector('px-vis-central-tooltip-content');
-
-    tooltip.set('opened', false);
-
-    tooltip.set('for', undefined);
-    tooltip.set('followMouse', false);
-    tooltip.set('mouseCoords', undefined);
-
-    content.set('tooltipDataResult', []);
-
-    this._usedTooltipMap.delete(evt.detail.origin);
-
-    evt.preventDefault();
-    evt.stopPropagation();
+    if (tooltip) {
+      const content = tooltip.querySelector('px-vis-central-tooltip-content');
+  
+      tooltip.set('opened', false);
+  
+      tooltip.set('for', undefined);
+      tooltip.set('followMouse', false);
+      tooltip.set('mouseCoords', undefined);
+  
+      content.set('tooltipDataResult', []);
+  
+      this._usedTooltipMap.delete(evt.detail.origin);
+  
+      evt.preventDefault();
+      evt.stopPropagation();
+    }
   },
 
   _centralTooltipLockRequest: function(evt) {
