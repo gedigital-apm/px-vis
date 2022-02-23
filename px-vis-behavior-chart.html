@@ -2818,15 +2818,17 @@ PxVisBehaviorChart.registerPagnation = [{
 
   _tooltipDataUpdated: function() {
     this._resetPages();
-
+    this.tooltipData["showTooltip"] = this.showTooltip;
     this.set('_registerTooltipData', this.tooltipData);
 
   },
 
   _updateRegisterData: function() {
     if(this._currentPage === 0) {
+      this.tooltipData["showTooltip"] = this.showTooltip;
       this.set('_registerTooltipData', this.tooltipData);
     } else {
+      this.tooltipData["showTooltip"] = this.showTooltip;
       this.set('_registerTooltipData', this.tooltipData.additionalPoints[this._currentPage - 1]);
     }
   }
