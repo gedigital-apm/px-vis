@@ -785,7 +785,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         dataObj.time =  e.data.time ? e.data.time : dataObj.time;
         dataObj.timeSeriesKey =  e.data.timeSeriesKey ? e.data.timeSeriesKey : dataObj.timeSeriesKey;
         dataObj.additionalPoints = e.data.additionalPoints;
-
+		dataObj.searchFor = this.searchFor;
         this._calcDataFinished(dataObj);
       }.bind(this);
 
