@@ -185,7 +185,7 @@ Custom property | Description
           <div id="seriesWrap" class$="[[_getSeriesWrapperClassReverse(type)]] [[_seriesWrapPadding(_isVertical)]]">
             <template is="dom-if" if="[[!_isOfType(xAxisType, 'pie')]]">
               <template is="dom-repeat" items="[[_series]]" as="_groups">
-                <div class$="[[_getSeriesWrapperClass(type)]] [[_itemWrapClass(_isVertical)]] u-ml- u-mr-">
+                <div class$="[[_getSeriesWrapperClass(type, tooltipData.*, _series, _groups)]] [[_itemWrapClass(_isVertical)]] u-ml- u-mr-">
                   <template is="dom-repeat" id="itemRepeat" items="[[_groups]]" rendered-item-count="{{_itemCount}}">
                     <px-vis-register-item
                       hidden = "[[_hideRegisterItem(tooltipData.*, item)]]"

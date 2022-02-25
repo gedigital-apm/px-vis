@@ -399,7 +399,7 @@ PxVisBehaviorRegister.register = [{
   /**
    * returns the correct classes for the series based on type
    */
-  _getSeriesWrapperClass: function(type) {
+  _getSeriesWrapperClass: function(type, tooltipData, _series, _groups) {
     if(this.hasUndefinedArguments(arguments)) {
       return;
     }
@@ -409,6 +409,17 @@ PxVisBehaviorRegister.register = [{
       classList += 'flex--row ';
     } else {
       classList += 'flex--col ';
+    }
+	
+	//Logic to hide the entire div that has hidden register items on Points mode
+	if(tooltipData && 
+    tooltipData.value.searchFor && 
+    tooltipData.value.searchFor == 'point' && 
+    Object.keys(this.tooltipData.seriesObj).length == 1 &&
+    _series.length > 1){      
+      if(_groups.indexOf( Object.keys(this.tooltipData.seriesObj)[0]) == -1){
+        classList += 'hide '
+      }
     }
 
     return classList;
