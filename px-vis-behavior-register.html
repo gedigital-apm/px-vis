@@ -413,7 +413,7 @@ PxVisBehaviorRegister.register = [{
 	
 	//Logic to hide the entire div that has hidden register items on Points mode
 	if(tooltipData && 
-    tooltipData.value.searchFor && 
+    tooltipData.value && 
     tooltipData.value.searchFor == 'point' && 
     Object.keys(this.tooltipData.seriesObj).length == 1 &&
     _series.length > 1){      
