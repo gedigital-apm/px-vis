@@ -185,9 +185,10 @@ Custom property | Description
           <div id="seriesWrap" class$="[[_getSeriesWrapperClassReverse(type)]] [[_seriesWrapPadding(_isVertical)]]">
             <template is="dom-if" if="[[!_isOfType(xAxisType, 'pie')]]">
               <template is="dom-repeat" items="[[_series]]" as="_groups">
-                <div class$="[[_getSeriesWrapperClass(type)]] [[_itemWrapClass(_isVertical)]] u-ml- u-mr-">
+                <div class$="[[_getSeriesWrapperClass(type, tooltipData.*, _series, _groups)]] [[_itemWrapClass(_isVertical)]] u-ml- u-mr-">
                   <template is="dom-repeat" id="itemRepeat" items="[[_groups]]" rendered-item-count="{{_itemCount}}">
                     <px-vis-register-item
+                      hidden = "[[_hideRegisterItem(tooltipData.*, item)]]"
                       class$="[[tooltipStyle]] [[_itemClass(_isVertical)]]"
                       data="[[_returnSeriesObj(tooltipData.*, item)]]"
                       series-key="[[item]]"
@@ -675,6 +676,18 @@ Custom property | Description
 
     _returnSeriesObj: function(data, key) {
       return this.tooltipData.seriesObj[key] || {};
+    },
+
+    _hideRegisterItem: function(data, key){
+        var hideItem = false;
+        if(data.value.searchFor == "point" //Only for Points View
+            && this.tooltipData.showTooltip != false //Only for Tooltip view
+            && Object.keys(data.value.seriesObj).length == 1){//Only if there is series object         
+          if(key !=  Object.keys(data.value.seriesObj)[0]){
+            hideItem =  true;
+          }
+        }
+        return hideItem;
     },
 
     _leftPage: function() {
