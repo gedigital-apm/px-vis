@@ -680,8 +680,7 @@ Custom property | Description
 
     _hideRegisterItem: function(data, key){
         var hideItem = false;
-        if(data.value.searchFor == "point" //Only for Points View
-            && this.tooltipData.showTooltip != false //Only for Tooltip view
+        if(data.value.searchFor == "point" //Only for Points View            
             && Object.keys(data.value.seriesObj).length == 1){//Only if there is series object         
           if(key !=  Object.keys(data.value.seriesObj)[0]){
             hideItem =  true;
