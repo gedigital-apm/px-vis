@@ -2827,6 +2827,7 @@ PxVisBehaviorChart.registerPagnation = [{
       this.set('_registerTooltipData', this.tooltipData);
     } else {
       this.set('_registerTooltipData', this.tooltipData.additionalPoints[this._currentPage - 1]);
+      this.tooltipData.additionalPoints[this._currentPage - 1]['searchFor'] = this._registerTooltipData.searchFor;
     }
   }
 }, PxVisBehaviorChart.registerPagnationBase];
