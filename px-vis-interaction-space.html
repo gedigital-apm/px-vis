@@ -277,7 +277,12 @@ TODO implement a dev setting to choose between only showing data at that x, snap
        */
       searchFor: {
         type: String,
-        value: 'point'
+        value: 'timestamp'
+      },
+
+      showTooltipPointsMode: {
+        type: Boolean,
+        value: false
       },
 
       /**
@@ -766,35 +771,46 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
     _searchOnWebWorker: function(mousePos, dataObj) {
       var ctx = {};
+
       var registerDataObj = {};
       var registerCtx = {};
 
-      this._calcTooltipContextData(registerCtx, mousePos);
+       //This change done for US541208 - We need to show point data in one up layout tooltip 
+      //and timestamp data in register
+      if (this.showTooltipPointsMode) {
+        this._calcTooltipContextData(registerCtx, mousePos);         
+      
+        registerCtx.successCallback = function(e) {
+          if(!e.data) { return; }
 
-      this._calcTooltipContextData(ctx, mousePos);     
+          this._populateTooltipDataObject(registerDataObj, e);       
+          
+        }.bind(this);
+
+        Px.vis.scheduler.process(registerCtx);
+        this.set('searchFor', 'point');
+      }
+      
+      this._calcTooltipContextData(ctx, mousePos);
     
-      registerCtx.successCallback = function(e) {
-        if(!e.data) { return; }
-
-        this._populateTooltipDataObject(registerDataObj, e);       
-        
-      }.bind(this);
-
-      ctx.data.searchFor = this.searchFor;
+      ctx.data.searchFor = this.searchFor;         
 
       ctx.successCallback = function(e) {
         if(!e.data) { return; }
 
-        this._populateTooltipDataObject(dataObj, e);
-        dataObj.registerTooltipData = registerDataObj;		    
-
+        this._populateTooltipDataObject(dataObj, e);  
+        if(this.showTooltipPointsMode) {    
+          dataObj.registerTooltipData = registerDataObj;
+        }
         this._calcDataFinished(dataObj);
       }.bind(this);
 
-      Px.vis.scheduler.process(registerCtx);
+     
       Px.vis.scheduler.process(ctx);
     },
 
+     //This change done for US541208 - We need to show point data in one up layout tooltip 
+      //and timestamp data in register
     _calcTooltipContextData: function(ctx, mousePos, type) {
       // now we can set our data that we want to pass out
 
@@ -813,6 +829,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      
     },
     
+     //This change done for US541208 - We need to show point data in one up layout tooltip 
+      //and timestamp data in register
     _populateTooltipDataObject: function(dataObj, e) {
 
       dataObj.series = e.data.series;
