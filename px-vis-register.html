@@ -126,7 +126,7 @@ Custom property | Description
     <div class="flex flex-row fullWidth fullHeight">  <!--  IE min-height + flex bug workaround-->
       <div id="registerWrap"
         class$="[[_getMinSizeClass(preventMinSize)]] inline--flex [[_registerWrapClass(_isHorizontal)]]"
-        style$="height:[[height]]px; max-height:[[height]]px; [[_returnWidth(chartWidth, width, margin, type)]]">
+        style$="height:[[height]]px; max-height:[[height]]px; ">
 
         <div class$="[[_show(_isHorizontal)]] [[_hide(hidePaginationControls)]] borderRight flex flex--center paginateButton">
           <button class$="[[_show(displayPageArrows)]] actionable flex__item--middle" on-click="_leftPage">
@@ -189,7 +189,7 @@ Custom property | Description
                   <template is="dom-repeat" id="itemRepeat" items="[[_groups]]" rendered-item-count="{{_itemCount}}">
                     <px-vis-register-item
                       hidden = "[[_hideRegisterItem(tooltipData.*, item)]]"
-                      class$="[[tooltipStyle]] [[_itemClass(_isVertical)]]"
+                      class$="[[_checkTooltipData(tooltipData.*, item)]] [[tooltipStyle]] [[_itemClass(_isVertical)]]"
                       data="[[_returnSeriesObj(tooltipData.*, item)]]"
                       series-key="[[item]]"
                       dynamic-menu-config="[[dynamicMenuConfig]]"
@@ -675,15 +675,36 @@ Custom property | Description
     },
 
     _returnSeriesObj: function(data, key) {
-      return this.tooltipData.seriesObj[key] || {};
+      return this.tooltipData.seriesObj[key] || {};     
     },
 
-    _hideRegisterItem: function(data, key){
+    _hideRegisterItem: function(data, key, evt){
+      var _this = this;
+         currTarget = Polymer.dom(evt).rootTarget;
         var hideItem = false;
+
+        // if (_this.dataHost._rootDataHost._scopeSelector === "px-vis-tooltip-0")
+        // {
+        //   hideItem = true;
+        // }
         if(data.value && data.value.searchFor === "point" //Only for Points View            
             && Object.keys(data.value.seriesObj).length === 1){//Only if there is series object         
           if(key !=  Object.keys(data.value.seriesObj)[0]){
             hideItem =  true;
+          }
+        }
+        return hideItem;
+    },
+
+    _checkTooltipData: function(evt, data, key){
+      var _this = this, 
+          currTarget = Polymer.dom(evt).rootTarget;
+        var hideItem = "";
+        if(data.value && data.value.searchFor === "timestamps" //Only for Points View            
+            && Object.keys(data.value.seriesObj).length > 1){//Only if there is series object         
+          if(key !=  Object.keys(data.value.seriesObj)[0]){
+            hideItem =  "hide";
+            
           }
         }
         return hideItem;

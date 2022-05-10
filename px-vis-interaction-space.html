@@ -79,7 +79,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       PxVisBehaviorD3.svg,
       PxVisBehaviorD3.axes,
       PxVisBehavior.dataset,
-      PxVisBehavior.tooltipData,
+      PxVisBehavior.tooltipData,      
       PxVisBehavior.mutedSeries,
       PxVisBehavior.crosshairData,
       PxVisBehavior.extentsData,
@@ -280,6 +280,11 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         value: 'timestamp'
       },
 
+      showTooltipPointsMode: {
+        type: Boolean,
+        value: false
+      },
+
       /**
        * Holder for the cursor drawing objects.
        *
@@ -401,6 +406,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       if(this._doesObjHaveValues(this.tooltipData)){
         this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': this.tooltipData, 'method':'set' });
       }
+  
 
       if(this._doesObjHaveValues(this.mouseRect)){
         this.fire('px-vis-mouse-rect-updated', {'data': this.mouseRect, 'dataVar': 'mouseRect', 'method': 'set'});
@@ -738,6 +744,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       }
     },
 
+    
+
     /**
      * Searches through all data series, then compiles and returns the tooltip data object.
      */
@@ -763,6 +771,49 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
     _searchOnWebWorker: function(mousePos, dataObj) {
       var ctx = {};
+
+      var registerDataObj = {};
+      var registerCtx = {};
+
+       //This change done for US541208 - We need to show point data in one up layout tooltip 
+      //and timestamp data in register
+      if (this.showTooltipPointsMode) {
+        this._calcTooltipContextData(registerCtx, mousePos);         
+      
+        registerCtx.successCallback = function(e) {
+          if(!e.data) { return; }
+
+          this._populateTooltipDataObject(registerDataObj, e);       
+          
+        }.bind(this);
+
+        Px.vis.scheduler.process(registerCtx);
+        this.set('searchFor', 'point');
+      }
+      
+      this._calcTooltipContextData(ctx, mousePos);
+    
+      ctx.data.searchFor = this.searchFor;         
+
+      ctx.successCallback = function(e) {
+        if(!e.data) { return; }
+
+        this._populateTooltipDataObject(dataObj, e);  
+        if(this.showTooltipPointsMode) {    
+          dataObj.registerTooltipData = registerDataObj;
+        }
+        this._calcDataFinished(dataObj);
+      }.bind(this);
+
+     
+      Px.vis.scheduler.process(ctx);
+    },
+
+     //This change done for US541208 - We need to show point data in one up layout tooltip 
+      //and timestamp data in register
+    _calcTooltipContextData: function(ctx, mousePos, type) {
+      // now we can set our data that we want to pass out
+
       ctx.action = 'findQuadtreePoints';
       ctx.originatorName = this.nodeName;
       ctx.chartId = this.chartId;
@@ -771,25 +822,26 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       ctx.data.calcCrosshair = this._calcCrosshair;
       ctx.data.radius = this.searchRadius;
       ctx.data.searchType = this.searchType;
-      ctx.data.searchFor = this.searchFor;
+      
       ctx.data.polygon = this._lassoCoords;
       ctx.data.mutedSeries = this.mutedSeries;
       ctx.data.hardMute = this.hardMute;
-      ctx.successCallback = function(e) {
-        if(!e.data) { return; }
+     
+    },
+    
+     //This change done for US541208 - We need to show point data in one up layout tooltip 
+      //and timestamp data in register
+    _populateTooltipDataObject: function(dataObj, e) {
 
-        dataObj.series = e.data.series;
-        dataObj.seriesObj = e.data.seriesObj;
-        dataObj.rawData = e.data.rawData;
-        dataObj.timeStamps = e.data.timeStamps;
-        dataObj.time =  e.data.time ? e.data.time : dataObj.time;
-        dataObj.timeSeriesKey =  e.data.timeSeriesKey ? e.data.timeSeriesKey : dataObj.timeSeriesKey;
-        dataObj.additionalPoints = e.data.additionalPoints;
-		dataObj.searchFor = this.searchFor;
-        this._calcDataFinished(dataObj);
-      }.bind(this);
+      dataObj.series = e.data.series;
+      dataObj.seriesObj = e.data.seriesObj;
+      dataObj.rawData = e.data.rawData;
+      dataObj.timeStamps = e.data.timeStamps;
+      dataObj.time =  e.data.time ? e.data.time : dataObj.time;
+      dataObj.timeSeriesKey =  e.data.timeSeriesKey ? e.data.timeSeriesKey : dataObj.timeSeriesKey;
+      dataObj.additionalPoints = e.data.additionalPoints;
+      dataObj.searchFor = this.searchFor;
 
-      Px.vis.scheduler.process(ctx);
     },
 
     /**
