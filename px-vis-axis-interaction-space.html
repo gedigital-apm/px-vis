@@ -831,7 +831,7 @@ Custom property | Description
 
       //if using categies, use it, otherwise default. Check for gradients.
       let baseColors = this.categoryKey && d[this.categoryKey] && this.completeSeriesConfig[d[this.categoryKey]] ? this.completeSeriesConfig[d[this.categoryKey]].color : this.completeSeriesConfig[this.seriesKey].color,
-          gradient = this.createGradientFunction(baseColors);
+          gradient = this.createGradientFunction(baseColors,this.completeSeriesConfig[this.seriesKey].minMaxColorRange);
 
       tooltipConfig[aid].color = gradient(d[this.seriesKey]);
 
