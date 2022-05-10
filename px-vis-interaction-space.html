@@ -801,6 +801,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         this._populateTooltipDataObject(dataObj, e);  
         if(this.showTooltipPointsMode) {    
           dataObj.registerTooltipData = registerDataObj;
+          this.set('searchFor', 'timestamp');
         }
         this._calcDataFinished(dataObj);
       }.bind(this);
