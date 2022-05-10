@@ -1512,13 +1512,13 @@ PxVisBehaviorD3.lineShared = [{
     var colors = {};
 
     //save each color individually for use later
-    colors[seriesId] = this.createGradientFunction(completeSeriesConfig[seriesId].color);
+    colors[seriesId] = this.createGradientFunction(completeSeriesConfig[seriesId].color, completeSeriesConfig[seriesId]._parxColorValue);
 
     // if coloring by category
     if(categories.length > 0) {
       for(var i = 0; i < categories.length; i++) {
         if(completeSeriesConfig[categories[i]]) {
-          colors[categories[i]] = this.createGradientFunction(completeSeriesConfig[categories[i]].color);
+          colors[categories[i]] = this.createGradientFunction(completeSeriesConfig[categories[i]].color, completeSeriesConfig[seriesId]._parxColorValue);
         }
       }
     }

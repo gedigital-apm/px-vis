@@ -3572,7 +3572,7 @@ PxVisBehavior.gradientColorsFunction = {
     }
   },
 
-  createGradientFunction: function(colors) {
+  createGradientFunction: function(colors, _parxColorValue) {
     if(colors) {
       if(typeof colors === 'string') {
         return function() {
@@ -3591,7 +3591,7 @@ PxVisBehavior.gradientColorsFunction = {
         }.bind(this);
       } else if(typeof colors === 'function') {
         return function(val) {
-          return colors(this._normalizeValue(val));
+          return colors(this._normalizeValue(val), _parxColorValue);
         }.bind(this);
       } else {
         console.warn('Color gradient ' + colors + ' has an invalid type. Should be string, array or function');
