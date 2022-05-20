@@ -788,20 +788,24 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         }.bind(this);
 
         Px.vis.scheduler.process(registerCtx);
-        this.set('searchFor', 'point');
+       // this.set('searchFor', 'point');
       }
       
       this._calcTooltipContextData(ctx, mousePos);
     
-      ctx.data.searchFor = this.searchFor;         
-
+      if (this.showTooltipPointsMode) {
+        ctx.data.searchFor = 'point';         
+      } else {
+        ctx.data.searchFor = this.searchFor;
+      }
       ctx.successCallback = function(e) {
         if(!e.data) { return; }
 
         this._populateTooltipDataObject(dataObj, e);  
         if(this.showTooltipPointsMode) {    
           dataObj.registerTooltipData = registerDataObj;
-          this.set('searchFor', 'timestamp');
+          dataObj.searchFor = 'point';
+          //this.set('searchFor', 'timestamp');
         }
         this._calcDataFinished(dataObj);
       }.bind(this);
