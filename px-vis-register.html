@@ -189,7 +189,7 @@ Custom property | Description
                   <template is="dom-repeat" id="itemRepeat" items="[[_groups]]" rendered-item-count="{{_itemCount}}">
                     <px-vis-register-item
                       hidden = "[[_hideRegisterItem(tooltipData.*, item)]]"
-                      class$="[[_checkTooltipData(tooltipData.*, item)]] [[tooltipStyle]] [[_itemClass(_isVertical)]]"
+                      class$="[[tooltipStyle]] [[_itemClass(_isVertical)]]"
                       data="[[_returnSeriesObj(tooltipData.*, item)]]"
                       series-key="[[item]]"
                       dynamic-menu-config="[[dynamicMenuConfig]]"
@@ -678,9 +678,7 @@ Custom property | Description
       return this.tooltipData.seriesObj[key] || {};     
     },
 
-    _hideRegisterItem: function(data, key, evt){
-      var _this = this;
-         currTarget = Polymer.dom(evt).rootTarget;
+    _hideRegisterItem: function(data, key){
         var hideItem = false;
 
         // if (_this.dataHost._rootDataHost._scopeSelector === "px-vis-tooltip-0")
@@ -691,20 +689,6 @@ Custom property | Description
             && Object.keys(data.value.seriesObj).length === 1){//Only if there is series object         
           if(key !=  Object.keys(data.value.seriesObj)[0]){
             hideItem =  true;
-          }
-        }
-        return hideItem;
-    },
-
-    _checkTooltipData: function(evt, data, key){
-      var _this = this, 
-          currTarget = Polymer.dom(evt).rootTarget;
-        var hideItem = "";
-        if(data.value && data.value.searchFor === "timestamps" //Only for Points View            
-            && Object.keys(data.value.seriesObj).length > 1){//Only if there is series object         
-          if(key !=  Object.keys(data.value.seriesObj)[0]){
-            hideItem =  "hide";
-            
           }
         }
         return hideItem;
