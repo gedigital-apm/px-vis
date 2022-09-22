@@ -736,7 +736,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           delete dataObj.rawData;
           delete dataObj.timeStamps;
           this.set('tooltipData',dataObj);
-          this.fire('px-vis-pinnedmarker-updated', { 'dataVar': 'tooltipData', 'data': dataObj, 'method':'set' });
+          const finalDataObj = dataObj.registerTooltipData ? dataObj.registerTooltipData : dataObj;
+          this.fire('px-vis-pinnedmarker-updated', { 'dataVar': 'tooltipData', 'data': finalDataObj, 'method':'set' });
 					this.set('_calcPinnedMarker', false);
         }
 
