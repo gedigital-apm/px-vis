@@ -2813,6 +2813,9 @@ PxVisBehaviorChart.registerPagnation = [{
   properties: {
     _registerTooltipData: {
       type: Object
+    },
+    _cursorData: {
+      type: Object
     }
   },
 
@@ -2822,6 +2825,12 @@ PxVisBehaviorChart.registerPagnation = [{
       this.set('_registerTooltipData', this.tooltipData.registerTooltipData);
     } else { 
      this.set('_registerTooltipData', this.tooltipData);
+    }
+    
+    if(this.tooltipData.registerTooltipData && this.tooltipData.registerTooltipData.searchFor === 'point') {
+      this.set('_cursorData', this.tooltipData);
+    } else {
+      this.set('_cursorData', this._registerTooltipData);
     }
 
   },
