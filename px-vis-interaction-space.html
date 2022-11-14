@@ -285,6 +285,11 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         value: false
       },
 
+      isEbqChart: { 
+        type: Boolean,
+        value: false
+      },
+
       /**
        * Holder for the cursor drawing objects.
        *
@@ -840,7 +845,11 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     _populateTooltipDataObject: function(dataObj, e) {
 
       dataObj.series = e.data.series;
-      dataObj.seriesObj = e.data.seriesObj;
+      if (this.isEbqChart && this.searchFor === 'point') {
+        this._setEbqPointsModeSeriesObj(dataObj, e)
+      } else {
+        dataObj.seriesObj = e.data.seriesObj;
+      }
       dataObj.rawData = e.data.rawData;
       dataObj.timeStamps = e.data.timeStamps;
       dataObj.time =  e.data.time ? e.data.time : dataObj.time;
@@ -848,6 +857,19 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       dataObj.additionalPoints = e.data.additionalPoints;
       dataObj.searchFor = this.searchFor;
 
+    },
+
+    /**
+     * Sets seriesObj for points mode for ebq chart.
+     *
+     * @method _setEbqPointsModeSeriesObj
+     */
+     _setEbqPointsModeSeriesObj: function(dataObj, e) {
+      const mouseHoverKey = e.data.timeSeriesKey ? e.data.timeSeriesKey : dataObj.timeSeriesKey;
+      if (e.data.seriesObj[mouseHoverKey]) {
+         dataObj.seriesObj = {};
+         dataObj.seriesObj[mouseHoverKey] = e.data.seriesObj[mouseHoverKey];
+       }
     },
 
     /**
