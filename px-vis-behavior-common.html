@@ -3591,11 +3591,32 @@ PxVisBehavior.gradientColorsFunction = {
         }.bind(this);
       } else if(typeof colors === 'function') {
         return function(val) {
-          return colors(this._normalizeValue(val), _parxColorValue);
+          if(_parxColorValue && _parxColorValue.gradientColorsRange){
+            return colors(this._normalizeValueWithTS(val, _parxColorValue), _parxColorValue);
+          } else {
+            return colors(this._normalizeValue(val), _parxColorValue);
+          }
         }.bind(this);
       } else {
         console.warn('Color gradient ' + colors + ' has an invalid type. Should be string, array or function');
       }
+    }
+  },
+
+  /**
+   * Use provided timestamps to calculative relative val
+   * */
+  _normalizeValueWithTS: function(val, _parxColorValue) {
+    if(_parxColorValue.gradientColorsRange.length === 2 && (_parxColorValue.gradientColorsRange[0] !==  undefined && _parxColorValue.gradientColorsRange[0] !== '') && (_parxColorValue.gradientColorsRange[1] !== undefined && _parxColorValue.gradientColorsRange[1] !== '')) {
+      let minTS = _parxColorValue.gradientColorsRange[0];
+      let maxTS = _parxColorValue.gradientColorsRange[1];
+      if(minTS === maxTS) {
+        return 0;
+      } else {
+        return (val - minTS) / (maxTS - minTS);
+      }
+    } else {
+      return this._normalizeValue(val);
     }
   },
 
