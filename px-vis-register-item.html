@@ -61,6 +61,9 @@ Custom property | Description
         */
         flex-shrink: 0;
       }
+      .word-wrap{
+        white-space: nowrap;
+      }
     </style>
     <span id="regItem"
       class$="[[_baseClasses]] register-item--min-width"
@@ -72,11 +75,15 @@ Custom property | Description
             name$="R[[seriesKey]]">&nbsp;</span>
         </span>
         <span class$="[[_wrapperClass]]" style="width:100%;">
-          <div id="seriesName" class="seriesName flex__item--msfix" name$="R[[seriesKey]]">
+          <div id="seriesName" class="seriesName flex__item--msfix" name$="R[[seriesKey]]" hidden$="[[isEbqChart]]">
             [[_truncatedName]]&nbsp;
           </div>
+          <div id="seriesName" class="seriesName flex__item--msfix" name$="R[[seriesKey]]" hidden$="[[!isEbqChart]]">
+            [[_ebqTruncateName]]&nbsp;
+          </div>
+          
           <!-- Use inline flex to avoid the browser adding spaces between our sub elements-->
-          <div class="seriesData flex__item--msfix" name$="R[[seriesKey]]">
+          <div class="seriesData flex__item--msfix word-wrap" name$="R[[seriesKey]]">
             [[_displayedData]]
           </div>
         </span>
@@ -156,14 +163,34 @@ Custom property | Description
       },
 			registerFormatCallback: {
 				type: Function
-			}
+			},
+      isEbqChart: {
+        type: Boolean,
+        value: false
+      },
+      _ebqTruncateName: {
+        type: String,
+        value: ''
+      },
     },
 
     observers: [
+      '_ebqChartTruncateName(_truncatedName)',
       '_toggleSeries(seriesKey, mutedSeries.*)',
       '_disableClickFunc(disableClick)',
       '_computeItem(_formattedX, _formattedY)'
     ],
+
+    _ebqChartTruncateName: function(_truncatedName) {
+      if(this.hasUndefinedArguments(arguments) || !this.isEbqChart) {
+        return;
+      }
+      const splittedName = _truncatedName.split(' ');
+      if(splittedName.length > 0){
+        const month = splittedName[0];
+        this._ebqTruncateName = _truncatedName.replace(month,month.substring(0,3));
+      }
+    },
 
     _computeItem: function() {
       if(this.hasUndefinedArguments(arguments)) {

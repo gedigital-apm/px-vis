@@ -281,6 +281,12 @@ Custom property | Description
         type: Boolean,
         value: false
       },
+
+      isXyChart: {
+        type: Boolean,
+        value: false
+      },
+
       _tooltipTimer: Number
     },
 
@@ -1479,20 +1485,41 @@ Custom property | Description
         var subConf = [],
             keys = Object.keys(conf.subConfig);
 
-        //reverse order to take flex-row-reverse into account
-        if(this.horizontalAlignment === 'right') {
-          for(var i=keys.length-1; i>-1; i--) {
-            subConf.push(conf.subConfig[keys[i]]);
-          }
+        if (this.isXyChart && conf.initialKey === 'crosshairLasso' && this.horizontalAlignment === 'right') {
+            this._setXySubConfigKeysOrder(keys, subConf, conf);
         } else {
-          for(var i=0; i<keys.length; i++) {
-            subConf.push(conf.subConfig[keys[i]]);
+          //reverse order to take flex-row-reverse into account
+          if (this.horizontalAlignment === 'right') {
+            for (var i = keys.length - 1; i > -1; i--) {
+              subConf.push(conf.subConfig[keys[i]]);
+            }
+          } else {
+            for (var i = 0; i < keys.length; i++) {
+              subConf.push(conf.subConfig[keys[i]]);
+            }
           }
         }
 
         this.set('currentSubConfig', subConf);
       } else {
         this.set('currentSubConfig', []);
+      }
+    },
+
+    _setXySubConfigKeysOrder: function (keys, subConf, conf) {
+      var xyKeys = keys;
+      keys = [];
+      for (var i = xyKeys.length - 1; i > -1; i--) {
+        if (i > 2) {
+          keys[i - 3] = xyKeys[i];
+        } else {
+          keys[i + 3] = xyKeys[i];
+        }
+      }
+      if (keys && keys.length > 0) {
+        for (var i = keys.length - 1; i > -1; i--) {
+          subConf.push(conf.subConfig[keys[i]]);
+        }
       }
     },
 
