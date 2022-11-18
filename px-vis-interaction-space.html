@@ -290,6 +290,11 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         value: false
       },
 
+      isXyChart: {
+        type: Boolean,
+        value: false
+      },
+
       /**
        * Holder for the cursor drawing objects.
        *
@@ -789,7 +794,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         registerCtx.successCallback = function(e) {
           if(!e.data) { return; }
 
-          this._populateTooltipDataObject(registerDataObj, e);       
+          this._populateTooltipDataObject(registerDataObj, e, 'register');       
           
         }.bind(this);
 
@@ -807,7 +812,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       ctx.successCallback = function(e) {
         if(!e.data) { return; }
 
-        this._populateTooltipDataObject(dataObj, e);  
+        this._populateTooltipDataObject(dataObj, e, 'tooltip');  
         if(this.showTooltipPointsMode) {    
           dataObj.registerTooltipData = registerDataObj;
           dataObj.searchFor = 'point';
@@ -842,24 +847,25 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     
      //This change done for US541208 - We need to show point data in one up layout tooltip 
       //and timestamp data in register
-    _populateTooltipDataObject: function(dataObj, e) {
+    _populateTooltipDataObject: function(dataObj, e, type) {
 
       dataObj.series = e.data.series;
-      if (this.isEbqChart && this.searchFor === 'point') {
+      if (this.isPointsMode(type)) {
         this._setEbqPointsModeSeriesObj(dataObj, e)
-      } else {
+      }
+      else {
         dataObj.seriesObj = e.data.seriesObj;
       }
-      dataObj.rawData = e.data.rawData;
-      dataObj.timeStamps = e.data.timeStamps;
-      dataObj.time =  e.data.time ? e.data.time : dataObj.time;
-      dataObj.timeSeriesKey =  e.data.timeSeriesKey ? e.data.timeSeriesKey : dataObj.timeSeriesKey;
-      dataObj.additionalPoints = e.data.additionalPoints;
-      dataObj.searchFor = this.searchFor;
+        dataObj.rawData = e.data.rawData;
+        dataObj.timeStamps = e.data.timeStamps;
+        dataObj.time = e.data.time ? e.data.time : dataObj.time;
+        dataObj.timeSeriesKey = e.data.timeSeriesKey ? e.data.timeSeriesKey : dataObj.timeSeriesKey;
+        dataObj.additionalPoints = e.data.additionalPoints;
+        dataObj.searchFor = this.searchFor;
 
     },
 
-    /**
+     /**
      * Sets seriesObj for points mode for ebq chart.
      *
      * @method _setEbqPointsModeSeriesObj
@@ -870,6 +876,16 @@ TODO implement a dev setting to choose between only showing data at that x, snap
          dataObj.seriesObj = {};
          dataObj.seriesObj[mouseHoverKey] = e.data.seriesObj[mouseHoverKey];
        }
+    },
+
+    /**
+     * Returns true for points mode for ebq chart and xy chart.
+     *
+     * @method isPointsMode
+     */
+     isPointsMode: function(type) {
+      return (this.isEbqChart && this.searchFor === 'point') ||
+       (this.isXyChart && !this.isEbqChart && type === 'tooltip' && !(!this.showTooltipPointsMode && this.searchFor !== 'point'))
     },
 
     /**

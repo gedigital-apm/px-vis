@@ -88,9 +88,11 @@ Custom property | Description
             hide-pagination-controls
             tooltip-style="[[tooltipStyle]]"
             truncation-length="100"
+            width="[[_ebqRegisterWidth]]"
             groupings="[[_groupings]]"
             force-date-time-display="[[forceDateTimeDisplay]]"
             chart-data="[[chartData]]"
+            is-ebq-chart="[[ isEbqChart ]]"
             x-axis-type="[[xAxisType]]"
             y-axis-type="[[yAxisType]]"
             complete-series-config="[[_mutedCompleteSeriesConfig]]"
@@ -181,6 +183,11 @@ Custom property | Description
         value: 1,
         computed: '_checkGroups(_mutedTooltipData.*, groupings)'
       },
+      _ebqRegisterWidth: {
+        type: Number,
+        value: 250,
+        computed: '_ebqRegWidth(isEbqChart)'
+      },
       /**
        * Whether to hide the tooltip.
        */
@@ -243,6 +250,13 @@ Custom property | Description
       if(this._tooltipElem) {
         this._tooltipElem.set('opened', false);
       }
+    },
+
+    _ebqRegWidth: function () {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+      return this.isEbqChart ? 320 : 250 
     },
 
     _checkGroups: function() {
