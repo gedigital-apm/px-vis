@@ -267,12 +267,12 @@ Custom property | Description
         this.tooltipData.searchFor === 'timestamps' && this.tooltipData.seriesObj) {
         const noOfTags = Object.keys(this.tooltipData.seriesObj).length;
         if (noOfTags >= 16 && noOfTags < 24) {
-          return 542;
+          return 542;                        // width of the tooltip w.r.t number of seriesobj in the timestamps mode  
         } else if (noOfTags >= 24) {
-          return 812;
+          return 812;                        // width of the tooltip w.r.t number of seriesobj in the timestamps mode
         }
       } else {
-        return 250;
+        return 250;                          // default width of the tooltip in the timestamps mode  
       }
     },
 
