@@ -183,10 +183,14 @@ Custom property | Description
         value: 1,
         computed: '_checkGroups(_mutedTooltipData.*, groupings)'
       },
+      isEbqChart: {
+				type: Boolean,
+				value: false
+			},
       _ebqRegisterWidth: {
         type: Number,
         value: 250,
-        computed: '_ebqRegWidth(isEbqChart)'
+        computed: '_ebqRegWidth(tooltipData.*, isEbqChart)'
       },
       /**
        * Whether to hide the tooltip.
@@ -256,7 +260,15 @@ Custom property | Description
       if(this.hasUndefinedArguments(arguments)) {
         return;
       }
-      return this.isEbqChart ? 320 : 250 
+      if(this.isEbqChart){
+        return 320;
+      }
+      if (this.tooltipData && !this.tooltipData.hidden && this.tooltipData.searchFor === 'timestamps'
+        && Object.keys(this.tooltipData.seriesObj).length >= 16) {
+        return 540;
+      } else {
+        return 250;
+      }
     },
 
     _checkGroups: function() {
