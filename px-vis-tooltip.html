@@ -263,7 +263,8 @@ Custom property | Description
       if(this.isEbqChart){
         return 320;
       }
-      if (this.tooltipData && !this.tooltipData.hidden && this.tooltipData.searchFor === 'timestamps') {
+      if (this.tooltipData && !this.tooltipData.hidden &&
+        this.tooltipData.searchFor === 'timestamps' && this.tooltipData.seriesObj) {
         const noOfTags = Object.keys(this.tooltipData.seriesObj).length;
         if (noOfTags >= 16 && noOfTags < 24) {
           return 542;
