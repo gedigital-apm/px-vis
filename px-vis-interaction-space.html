@@ -711,8 +711,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
             if(this._lassoCrosshairData) {
               newData = {
-                rawData: this._lassoCrosshairData.rawData || [],
-                timeStamps: this._lassoCrosshairData.timeStamps || []
+                rawData: this.crosshairData.rawData || [],
+                timeStamps: this.crosshairData.timeStamps || []
               };
             } else {
               newData = {
