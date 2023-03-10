@@ -75,11 +75,8 @@ Custom property | Description
             name$="R[[seriesKey]]">&nbsp;</span>
         </span>
         <span class$="[[_wrapperClass]]" style="width:100%;">
-          <div id="seriesName" class="seriesName flex__item--msfix" name$="R[[seriesKey]]" hidden$="[[isEbqChart]]" on-mouseover="_onTitleHover" on-mouseout="_onTitleLeave">
-            [[_truncatedName]]&nbsp;
-          </div>
-          <div id="seriesName" class="seriesName flex__item--msfix" name$="R[[seriesKey]]" hidden$="[[!isEbqChart]]">
-            [[_ebqTruncateName]]&nbsp;
+          <div id="seriesName" class="seriesName flex__item--msfix" name$="R[[seriesKey]]">
+            [[_displayRegItem(isEbqChart, _truncatedName, _ebqTruncateName)]]&nbsp;
           </div>
           
           <!-- Use inline flex to avoid the browser adding spaces between our sub elements-->
@@ -194,6 +191,18 @@ Custom property | Description
       }
     },
 
+    _displayRegItem: function(isEbqChart, _truncatedName, _ebqTruncateName ) {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+      if(_truncatedName && !isEbqChart){
+        return _truncatedName;
+      }
+      if (_ebqTruncateName){
+        return _ebqTruncateName;
+      }
+    },
+    
     _computeItem: function() {
       if(this.hasUndefinedArguments(arguments)) {
         return;
