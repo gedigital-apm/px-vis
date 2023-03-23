@@ -189,10 +189,14 @@ Custom property | Description
 				type: Boolean,
 				value: false
 			},
+      isEbqSsChart: {
+        type: Boolean,
+        value: false
+      },
       _ebqRegisterWidth: {
         type: Number,
         value: 250,
-        computed: '_ebqRegWidth(tooltipData.*, isEbqChart)'
+        computed: '_ebqRegWidth(tooltipData.*, isEbqChart, isEbqSsChart)'
       },
       /**
        * Whether to hide the tooltip.
@@ -264,6 +268,9 @@ Custom property | Description
       }
       if(this.isEbqChart){
         return 320;
+      }
+      if (this.isEbqSsChart) {
+        return 350;
       }
       if (this.tooltipData && !this.tooltipData.hidden &&
         this.tooltipData.searchFor === 'timestamps' && this.tooltipData.seriesObj) {
