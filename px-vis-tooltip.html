@@ -89,7 +89,7 @@ Custom property | Description
             hide-pagination-controls
             tooltip-style="[[tooltipStyle]]"
             truncation-length="100"
-            width="[[_ebqRegisterWidth]]"
+            width="[[tooltipWidth]]"
             groupings="[[_groupings]]"
             force-date-time-display="[[forceDateTimeDisplay]]"
             chart-data="[[chartData]]"
@@ -185,18 +185,14 @@ Custom property | Description
         value: 1,
         computed: '_checkGroups(_mutedTooltipData.*, groupings)'
       },
-      isEbqChart: {
-				type: Boolean,
-				value: false
-			},
       isEbqSsChart: {
         type: Boolean,
         value: false
       },
-      _ebqRegisterWidth: {
+      tooltipWidth: {
         type: Number,
         value: 250,
-        computed: '_ebqRegWidth(tooltipData.*, isEbqChart, isEbqSsChart)'
+        computed: '_tooltipWidth(tooltipData.*, isEbqSsChart)'
       },
       /**
        * Whether to hide the tooltip.
@@ -262,15 +258,9 @@ Custom property | Description
       }
     },
 
-    _ebqRegWidth: function () {
+    _tooltipWidth: function () {
       if(this.hasUndefinedArguments(arguments)) {
         return;
-      }
-      if(this.isEbqChart){
-        return 320;
-      }
-      if (this.isEbqSsChart) {
-        return 350;
       }
       if (this.tooltipData && !this.tooltipData.hidden &&
         this.tooltipData.searchFor === 'timestamps' && this.tooltipData.seriesObj) {
@@ -280,9 +270,10 @@ Custom property | Description
         } else if (noOfTags >= 24) {
           return 812;                        // width of the tooltip w.r.t number of seriesobj in the timestamps mode
         }
-      } else {
-        return 250;                          // default width of the tooltip in the timestamps mode  
+      } else if (this.isEbqSsChart) {
+        return 360;
       }
+      return this.tooltipData && this.tooltipData.width;
     },
 
     _checkGroups: function() {
