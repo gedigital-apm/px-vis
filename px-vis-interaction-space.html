@@ -295,6 +295,11 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         value: false
       },
 
+      isPolarChart: {
+        type: Boolean,
+        value: false
+      },
+
       /**
        * Holder for the cursor drawing objects.
        *
@@ -853,7 +858,47 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         dataObj.timeSeriesKey = e.data.timeSeriesKey ? e.data.timeSeriesKey : dataObj.timeSeriesKey;
         dataObj.additionalPoints = e.data.additionalPoints;
         dataObj.searchFor = this.searchFor;
+        this._setTooltipWidth(dataObj, this.isEbqChart, this.isXyChart, this.isPolarChart);
+    },
 
+    /**
+     * Sets Tooltip width.
+     *
+     * @method _setTooltipWidth
+     */
+    _setTooltipWidth: function (dataObj, isEbqChart, isXyChart, isPolarChart) {
+      let precisionCount = 3;
+      if (isEbqChart || isXyChart || isPolarChart) {
+        precisionCount = this._getPrecisionCount(dataObj);
+      }
+      if (!isEbqChart && (isXyChart || isPolarChart) && precisionCount) {
+        dataObj.width = (precisionCount < 4) ? 250 : (precisionCount < 7) ? 300 : 340;                     // Tooltip width for Time Series Analysis
+      } else if (isEbqChart && precisionCount) {
+        dataObj.width = (precisionCount < 4) ? 380 : (precisionCount < 7) ? 420 : 450;                    // Tooltip width for Event Frame Analysis
+      } 
+    },
+
+    /**
+     * returns number of decimal values of an Integer.
+     *
+     * @method _getPrecisionCount
+     */
+    _getPrecisionCount: function (dataObj) {
+      if (!_.isEmpty(dataObj.seriesObj) && !_.isEmpty(dataObj.timeSeriesKey)) {
+        const seriesKey = dataObj.timeSeriesKey;
+        if (dataObj.seriesObj[seriesKey] && dataObj.seriesObj[seriesKey].value
+          && Object.keys(dataObj.seriesObj[seriesKey].value).length > 1) {
+          const key1 = Object.keys(dataObj.seriesObj[seriesKey].value)[0];
+          const key2 = Object.keys(dataObj.seriesObj[seriesKey].value)[1];
+          const value1 = dataObj.seriesObj[seriesKey].value[key1].toString();
+          const value2 = dataObj.seriesObj[seriesKey].value[key2].toString();
+          if (value1 && value2) {
+            const finalValue = (value2.length > value1.length) ? value2 : value1;
+            const index = finalValue.indexOf(".");
+            return (finalValue.length - index - 1);
+          }
+        }
+      }
     },
 
      /**
