@@ -142,6 +142,10 @@ PxVisBehavior.dataConverterMethods = {
             lowest = originalData[i][dataKey][indexes[i]][0];
             // set our obj x value
             obj[this.newXKey] = lowest;
+            // set category for spiderWeb and parallel.
+            if (originalData[i].category) {
+              obj.category = originalData[i].category;
+            }
             // set our obj y value
             obj[id[i]] = originalData[i][dataKey][indexes[i]][1];
             // track in index we are at
