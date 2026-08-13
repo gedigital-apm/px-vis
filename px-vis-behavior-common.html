@@ -2652,13 +2652,17 @@ PxVisBehavior.highlightShared = [{
    */
   _calcDataset: function() {
     var d = [],
-        lowerFuzz,
-        upperFuzz;
+      lowerFuzz,
+      upperFuzz,
+      hasChartData = Array.isArray(this.chartData) && this.chartData.length > 0;
 
-    for(var i = 0; i < this.crosshairData.timeStamps.length; i++) {
-
-      if(!this.hardMute || !this.mutedSeries[this.crosshairData.timeStamps[i]]) {
-        if(this.fuzz) {
+    if (!hasChartData || !this.crosshairData || !Array.isArray(this.crosshairData.timeStamps)) {
+      return d;
+    }
+    
+    for (var i = 0; i < this.crosshairData.timeStamps.length; i++) {
+      if (hasChartData && (!this.hardMute || !this.mutedSeries[this.crosshairData.timeStamps[i]])) {
+        if (this.fuzz) {
           lowerFuzz = this.crosshairData.timeStamps[i] - Number(this.fuzz);
           upperFuzz = this.crosshairData.timeStamps[i] + Number(this.fuzz);
 
